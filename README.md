@@ -1,2 +1,18 @@
-# aiu
-试用vue3
+```bash
+cd vue-pure-admin
+
+npm install
+
+```
+
+- run
+
+```bash
+npm run serve
+```
+
+- build
+
+```bash
+npm run build
+```
