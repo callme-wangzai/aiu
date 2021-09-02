@@ -21,6 +21,16 @@
             ></vxe-button
           >
           </div>
+          <!-- <div>
+            <span>图1:{{row.mainImg[0].name}}</span>
+            <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.mainImg[0])"
+            ></vxe-button>
+          </div>
+          <div>
+            <span>图2:{{row.mainImg[1].name}}</span>
+            <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.mainImg[1])"
+            ></vxe-button>
+          </div> -->
         </template>
       </vxe-table-column>
     </vxe-table>
@@ -256,11 +266,11 @@ export default {
             description: "serviceStatus",
             mainImg:[
               {
-                name:'图1',
+                name:'img1',
                 url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
               },
               {
-                name:'图2',
+                name:'img2',
                 url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
               }
             ]
@@ -269,7 +279,9 @@ export default {
             id: "1-2",
             name: "跳绳",
             title:'',
-            description: "onlienStatus"
+            description: "onlienStatus",
+            mainImg:[]
+
           },
           { 
             id: 2, 

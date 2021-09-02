@@ -21,24 +21,68 @@
       </vxe-table-column>
       <vxe-table-column title="标题" field="title" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="描述" field="description" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="描述" field="des" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="主图片" field="mainImg">
+      <vxe-table-column title="商城链接" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      </vxe-table-column>
+      <vxe-table-column title="首页顺序" field="sortForHome" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      </vxe-table-column>
+      <vxe-table-column title="智能硬件顺序" field="sortForMenu3" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      </vxe-table-column>
+      <vxe-table-column title="主图片" field="files">
         <template #default="{ row }">
-          <div v-for="(item,index) in row.mainImg" :key="index">
-            {{item.name}} 
-            <vxe-button type="text" icon="el-icon-edit" @click="editImg(item)"
-            ></vxe-button
-          >
+          <div class="flex">
+            <div>
+              <span class="link" @click="editImg(row.files[0])" v-if="row.files[0]&&row.files[0].name!==''">
+                {{row.files[0]?row.files[0].name:''}}
+              </span>
+              <span class="link" @click="editImg(row.files[0])" v-else>请选择</span>
+              
+            </div>
+            <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[0])"
+            ></vxe-button> -->
+          </div>
+          <div class="flex">
+            <div>
+              <span class="link" @click="editImg(row.files[1])" v-if="row.files[1]&&row.files[1].name!==''">{{row.files[1]?row.files[1].name:''}}</span>
+              <span class="link" @click="editImg(row.files[1])" v-else>请选择</span>
+            </div>
+            <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[1])"
+            ></vxe-button> -->
           </div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="文件地址" field="fileAddress"></vxe-table-column>
-      <vxe-table-column title="操作" width="330" fixed="right">
+      <vxe-table-column title="轮播图" field="carouselFigure">
         <template #default="{ row }">
-          <vxe-button type="text" icon="el-icon-edit" @click="onEdit(row)"
-            >编辑</vxe-button
-          >
+          <div class="flex">
+            <div>
+              <span class="link" @click="editImg(row.carouselFigure[0])" v-if="row.carouselFigure[0]&&row.carouselFigure[0].name!==''">
+                {{row.carouselFigure[0]?row.carouselFigure[0].name:''}}
+              </span>
+              <span class="link" @click="editImg(row.carouselFigure[0])" v-else>请选择</span>
+              
+            </div>
+          </div>
+          <div class="flex">
+            <div>
+              <span class="link" @click="editImg(row.carouselFigure[1])" v-if="row.carouselFigure[1]&&row.carouselFigure[1].name!==''">{{row.carouselFigure[1]?row.carouselFigure[1].name:''}}</span>
+              <span class="link" @click="editImg(row.carouselFigure[1])" v-else>请选择</span>
+            </div>
+          </div>
+        </template>
+      </vxe-table-column>
+      <vxe-table-column title="视频" field="videoLink">
+        <template #default="{ row }">
+          <div v-if="row.videoLink && row.videoLink!==''" @click="editVideo" class="link" >
+            {{row.videoLink}}
+          </div>
+          <div v-else @click="editVideo" class="link" >
+            请选择
+          </div>
+        </template>
+      </vxe-table-column>
+      <vxe-table-column title="操作" width="100" fixed="right">
+        <template #default="{ row }">
           <vxe-button type="text" icon="el-icon-delete" @click="confirmEvent(row)"
             >删除</vxe-button
           >
@@ -46,16 +90,29 @@
       </vxe-table-column>
     </vxe-table>
 
-    <!-- 修改、添加弹框 -->
+    <!-- 选择图片 -->
     <vxe-modal
       resize
       width="450"
       v-model="showEdit"
-      :title="fileType ? '选择图片' : '选择视频'"
+      title="选择图片"
       :loading="submitLoading"
     >
       <template #default>
-        <ModalFile ref="modal" @selectFile="selectFile" :fileType="fileType"></ModalFile>
+        <ModalFile ref="modal" @selectFile="selectImg" :fileType="1"></ModalFile>
+      </template>
+    </vxe-modal>
+
+    <!-- 选择视频 -->
+    <vxe-modal
+      resize
+      width="450"
+      v-model="videoModal"
+      title="选择视频"
+      :loading="submitLoading"
+    >
+      <template #default>
+        <ModalFile ref="modal" @selectFile="selectVideo" :fileType="2"></ModalFile>
       </template>
     </vxe-modal>
 
@@ -89,6 +146,7 @@ export default {
       submitLoading: false,
       saveItem:'',
       showEdit: false,
+      videoModal:false,
       selectRow: null,
       filterName: "",
       tableData: [
@@ -96,51 +154,7 @@ export default {
       formData: {
         name: "",
         model: ""
-      },
-      formItems: [
-        {
-          field: "name",
-          title: "商品名称",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入商品名称" }
-          }
-        },
-        {
-          field: "model",
-          title: "标题",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: {
-              placeholder: "请输入",
-              //这里vxe-table文档并没有提到，可以配置所选组件的所有属性，比如这里可以配置关于vxe-input的所有属性
-              // disabled: true
-            }
-          }
-        },
-        {
-          field: "description",
-          title: "描述",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: {placeholder: "请输入"}
-          }
-        },
-        {
-          align: "right",
-          span: 24,
-          itemRender: {
-            name: "$buttons",
-            children: [
-              { props: { type: "submit", content: "提交", status: "primary" } },
-              { props: { type: "reset", content: "重置" } }
-            ]
-          }
-        }
-      ] as VxeFormPropTypes.Items
+      }
     });
 
     const xTree = templateRef<HTMLElement | any>("xTree", null);
@@ -244,14 +258,6 @@ export default {
       initData()
     }
 
-    // 编辑
-    function onEdit(row: any) {
-      dictData.formData = {
-        name: row.name,
-        model: row.model ? row.model : "暂无字典类型"
-      };
-      commonFn(row, false);
-    }
     // 编辑主图片
     function editImg(item){
       dictData.showEdit = true;
@@ -260,27 +266,26 @@ export default {
       // item.name = "picture"
       dictData.saveItem = item.name
     }
-    const selectFile = (data) =>{
+    // 编辑视频地址
+    function editVideo(item){
+      dictData.videoModal = true;
+      // const modalRef = modal.value;
+      // modalRef
+      // item.name = "picture"
+      // dictData.saveItem = item.name
+    }
+    const selectImg = (data) =>{
       dictData.showEdit = false;
       console.log('data',data)
       dictData.saveItem = data.name
     }
 
-    const submitEvent = () => {
-      dictData.submitLoading = true;
-      setTimeout(() => {
-        const $table = xTree.value;
-        dictData.submitLoading = false;
-        dictData.showEdit = false;
-        if (dictData.selectRow) {
-          VXETable.modal.message({ content: "保存成功", status: "success" });
-          Object.assign(dictData.selectRow, dictData.formData);
-        } else {
-          VXETable.modal.message({ content: "新增成功", status: "success" });
-          $table.insert(dictData.formData);
-        }
-      }, 500);
-    };
+    const selectVideo = (data) =>{
+      // dictData.videoModal = false;
+      // console.log('data',data)
+      // dictData.saveItem = data.name
+    }
+
     function initData(){
       console.log('initData')
       // axios.get('').then(res=>{})
@@ -290,29 +295,46 @@ export default {
             id: "1-1",
             name: "筋膜枪",
             title:'',
-            description: "serviceStatus",
-            mainImg:[
+            des: "serviceStatus",
+            mallLink:'',
+            sortForHome:'',
+            sortForMenu3:'',
+            files:[
               {
-                name:'图1',
+                name:'img1',
                 url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
               },
               {
-                name:'图2',
+                name:'img2',
                 url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
               }
-            ]
+            ],
+            carouselFigure:[],
+            videoLink:'',
           },
           {
             id: "1-2",
             name: "跳绳",
             title:'',
-            description: "onlienStatus"
+            des: "onlienStatus",
+            mallLink:'',
+            sortForHome:'',
+            sortForMenu3:'',
+            files:[],
+            carouselFigure:[],
+            videoLink:''
           },
           { 
             id: 2, 
             name: "体脂秤", 
             title:'',
-            description: "operatingSystem" 
+            des: "operatingSystem",
+            mallLink:'',
+            sortForHome:'',
+            sortForMenu3:'',
+            files:[],
+            carouselFigure:[],
+            videoLink:'' 
           }
         ]
         // dictData.submitLoading = false;  
@@ -328,12 +350,12 @@ export default {
       ...toRefs(dictData),
       formatDate,
       confirmEvent,
-      submitEvent,
-      onEdit,
       editImg,
+      editVideo,
       onAdd,
       onSave,
-      selectFile
+      selectImg,
+      selectVideo
     };
   }
 };
@@ -358,5 +380,13 @@ export default {
   &:hover {
     cursor: pointer;
   }
+}
+.flex{
+  display:flex;
+  justify-content: space-between;
+}
+.link{
+  cursor: pointer;
+  color: #409FFF;
 }
 </style>
