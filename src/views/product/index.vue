@@ -93,7 +93,7 @@
     <!-- 选择图片 -->
     <vxe-modal
       resize
-      width="450"
+      width="70%"
       v-model="showEdit"
       title="选择图片"
       :loading="submitLoading"
@@ -106,7 +106,7 @@
     <!-- 选择视频 -->
     <vxe-modal
       resize
-      width="450"
+      width="60%"
       v-model="videoModal"
       title="选择视频"
       :loading="submitLoading"
@@ -191,7 +191,18 @@ export default {
     function onAdd() {
       // router.push("/product/addProduct")
       const $table = xTree.value;
-      $table.insert({});
+      $table.insert({
+            // id: "1-2",
+            name: "",
+            title:'',
+            des: "",
+            mallLink:'',
+            sortForHome:'',
+            sortForMenu3:'',
+            files:[],
+            carouselFigure:[],
+            videoLink:''
+          },);
     }
 
     //保存å
@@ -264,7 +275,7 @@ export default {
       // const modalRef = modal.value;
       // modalRef
       // item.name = "picture"
-      dictData.saveItem = item.name
+      // dictData.saveItem = item.name
     }
     // 编辑视频地址
     function editVideo(item){

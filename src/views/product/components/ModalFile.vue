@@ -8,35 +8,32 @@
       :data="tableData"
       :edit-config="{trigger: 'click', mode: 'cell'}"
     >
-      <vxe-column type="checkbox" width="60"></vxe-column>
-      <vxe-table-column title="文件名称" field="name" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-column type="checkbox" width="60">
+      </vxe-column>
+      <vxe-table-column title="文件名称" field="name">
       </vxe-table-column>
-      <vxe-table-column title="描述" field="description" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="描述" field="description">
       </vxe-table-column>
-      <vxe-table-column title="图片" field="mainImg">
+      <vxe-table-column title="预览" field="mainImg">
         <template #default="{ row }">
-          <div v-for="(item,index) in row.mainImg" :key="index">
-            {{item.name}} 
-            <vxe-button type="text" icon="el-icon-edit" @click="editImg(item)"
-            ></vxe-button
-          >
-          </div>
-          <!-- <div>
-            <span>图1:{{row.mainImg[0].name}}</span>
-            <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.mainImg[0])"
-            ></vxe-button>
-          </div>
-          <div>
-            <span>图2:{{row.mainImg[1].name}}</span>
-            <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.mainImg[1])"
-            ></vxe-button>
-          </div> -->
+          <img class="img" :src="row.mainImg" alt="">
         </template>
       </vxe-table-column>
     </vxe-table>
+    <vxe-pager
+          :loading="loading"
+          :current-page="tablePage1.currentPage"
+          :page-size="tablePage1.pageSize"
+          :total="tablePage1.totalResult"
+          :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
+          @page-change="handlePageChange1">
+        </vxe-pager>
 
-    <vxe-button status="primary" @click="submit()">确定</vxe-button>
-    <!-- <vxe-button @click="onSave()">取消</vxe-button> -->
+    <div class="flex">
+      <vxe-button status="primary" @click="submit()">确定</vxe-button>
+    </div>
+    
+    <!-- <vxe-button @click="cancel()">取消</vxe-button> -->
 
   </div>
 </template>
@@ -73,56 +70,18 @@ export default {
       showEdit: false,
       selectRow: null,
       filterName: "",
+      loading:false,
       tableData: [
       ],
       formData: {
         name: "",
         model: ""
       },
-      formItems: [
-        {
-          field: "name",
-          title: "商品名称",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: { placeholder: "请输入商品名称" }
-          }
-        },
-        {
-          field: "model",
-          title: "标题",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: {
-              placeholder: "请输入",
-              //这里vxe-table文档并没有提到，可以配置所选组件的所有属性，比如这里可以配置关于vxe-input的所有属性
-              // disabled: true
-            }
-          }
-        },
-        {
-          field: "description",
-          title: "描述",
-          span: 24,
-          itemRender: {
-            name: "$input",
-            props: {placeholder: "请输入"}
-          }
-        },
-        // {
-        //   align: "right",
-        //   span: 24,
-        //   itemRender: {
-        //     name: "$buttons",
-        //     children: [
-        //       { props: { type: "submit", content: "提交", status: "primary" } },
-        //       { props: { type: "reset", content: "重置" } }
-        //     ]
-        //   }
-        // }
-      ] as VxeFormPropTypes.Items
+      tablePage1: {
+                currentPage: 1,
+                pageSize: 10,
+                totalResult: 33
+              }
     });
 
     const xTree = templateRef<HTMLElement | any>("xTree", null);
@@ -264,36 +223,34 @@ export default {
             name: "筋膜枪",
             title:'',
             description: "serviceStatus",
-            mainImg:[
-              {
-                name:'img1',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              },
-              {
-                name:'img2',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              }
-            ]
+            mainImg:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+              
           },
           {
             id: "1-2",
             name: "跳绳",
             title:'',
             description: "onlienStatus",
-            mainImg:[]
+            mainImg:''
 
           },
           { 
             id: 2, 
             name: "体脂秤", 
             title:'',
-            description: "operatingSystem" 
+            description: "operatingSystem" ,
+            mainImg:''
           }
         ]
         // dictData.submitLoading = false;  
         const $table = xTree.value; 
         $table.loadData(dictData.tableData)
       },1000)
+    }
+    function handlePageChange1 ({ currentPage, pageSize }) {
+      dictData.tablePage1.currentPage = currentPage
+      dictData.tablePage1.pageSize = pageSize
+      initData()
     }
     onMounted(()=>{
       initData()
@@ -307,7 +264,7 @@ export default {
       onEdit,
       editImg,
       onAdd,
-      onSave,submit
+      onSave,submit,handlePageChange1
     };
   }
 };
@@ -322,9 +279,9 @@ export default {
 .vxe-button + .vxe-button--dropdown {
   margin-left: 0;
 }
-.vxe-button.type--button:not(.is--round) {
-  border-radius: 0;
-}
+// .vxe-button.type--button:not(.is--round) {
+//   border-radius: 0;
+// }
 .vxe-button.size--medium.type--button {
   margin-right: 0.07em;
 }
@@ -332,5 +289,13 @@ export default {
   &:hover {
     cursor: pointer;
   }
+}
+.img{
+  // width: 100px;
+  height: 80px;
+}
+.flex{
+  // display:flex;
+  text-align: center;
 }
 </style>

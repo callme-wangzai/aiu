@@ -23,16 +23,16 @@ const productRouter = {
         savedPosition: true
       },
     },
-    {
-      path: "/product/addProduct",
-      name: "addProduct",
-      component: () => import("/@/views/product/components/addProduct.vue"),
-      meta: {
-        title: "message.hsaddProduct",
-        showLink: true,
-        savedPosition: true
-      }
-    }
+    // {
+    //   path: "/product/addProduct",
+    //   name: "addProduct",
+    //   component: () => import("/@/views/product/components/addProduct.vue"),
+    //   meta: {
+    //     title: "message.hsaddProduct",
+    //     showLink: true,
+    //     savedPosition: true
+    //   }
+    // }
   ]
 };
 
