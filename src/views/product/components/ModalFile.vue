@@ -1,8 +1,16 @@
 <template>
   <div class="ModalFile-container">
         <!-- 列表 -->
+    <vxe-modal
+      resize
+      width="70%"
+      v-model="modal"
+      :title="fileType===1?'选择图片':'选择视频'"
+      :loading="submitLoading"
+      @close="closeModal"
+    >
     <vxe-table
-      ref="xTree"
+      ref="fileGrid"
       border
       resizable
       :data="tableData"
@@ -34,7 +42,7 @@
     </div>
     
     <!-- <vxe-button @click="cancel()">取消</vxe-button> -->
-
+    </vxe-modal>
   </div>
 </template>
 <script lang="ts">
@@ -53,19 +61,32 @@ import {
 export default {
   name: "ModalFile",
   props: {
-    fileType: Number
+    fileType: Number,//1:图片；2:视频；
+    multi:Boolean,//true：多选；false：单选
+    modal: Boolean,//模态框展示与否
   },
   components: {
   
   },
   setup(props,ctx) {
+    console.log('props',props)
     const submit = () =>{
-      const $table = xTree.value;
+      const $table = fileGrid.value;
       const selectRecords = $table.getCheckboxRecords()
+      if(selectRecords.length===0){
+        VXETable.modal.message({ content: "请勾选数据", status: "warning" })
+        return
+      }
+      if(selectRecords.length>1 && !props.multi){
+        VXETable.modal.message({ content: "请勿勾选多条数据", status: "warning" })
+        return
+      }
       ctx.emit('selectFile',selectRecords)
     }
-    const router = useRouter();
-    const dictData = reactive({
+    const closeModal = () => {
+      ctx.emit('closeModal',[])
+    }
+    const fileData = reactive({
       submitLoading: false,
       showEdit: false,
       selectRow: null,
@@ -84,140 +105,13 @@ export default {
               }
     });
 
-    const xTree = templateRef<HTMLElement | any>("xTree", null);
-    const formatDate = (value: any) => {
-      return XEUtils.toDateString(value, "yyyy-MM-dd HH:mm:ss.S");
-    };
+    const fileGrid = templateRef<HTMLElement | any>("fileGrid", null);
 
-    const confirmEvent = async (row) => {
-      const type = await VXETable.modal.confirm("您确定要删除吗？");
-      if(await type!=='confirm')return
-      let index:number
-      for(let i=0 ; i < dictData.tableData.length;i++){
-        if(dictData.tableData[i].id===row.id){
-          index = i
-        }
-      }
-      dictData.tableData.splice(index,1)
-      setTimeout(() => {
-        const $table = xTree.value;
-        $table.loadData(dictData.tableData)
-        VXETable.modal.message({ content: "删除成功", status: "success" })
-        // initData()
-      }, 500)
-    };
-
-    function commonFn(value, disabled) {
-      dictData.selectRow = value;
-      dictData.showEdit = true;
-      // dictData.formItems[1].itemRender.props.disabled = disabled;
-    }
-
-    // 新增
-    function onAdd() {
-      // router.push("/product/addProduct")
-      const $table = xTree.value;
-      $table.insert({});
-    }
-
-    //保存å
-    function onSave(){
-      const $table = xTree.value;
-      const selectRecords = $table.getCheckboxRecords()
-      if(selectRecords.length===0){
-        VXETable.modal.message({ content: "请勾选数据", status: "success" })
-        return
-      }
-      let list1 = []
-      let list2 = []
-      for(let item of selectRecords){
-        if(item.id){
-          list1.push(item)//修改
-        }else{
-          list2.push(item)//新增
-        }
-      }
-      // let p1 = (url,params)=>{
-      //   params = params || {};
-      //   return new Promise((resolve,reject)=>{
-      //       // axiso 自带 get 和 post 方法
-      //       axios.get(url,{
-      //           params,
-      //       }).then(res=>{
-      //           if(res.data.status===0){
-      //               resolve(res.data);
-      //           }else{
-      //               alert(res.data.msg)
-      //           }
-      //       }).catch(error=>{
-      //           alert('网络异常');
-      //       })
-      //   })
-      // }
-      // let p2 = (url,params)=>{
-      //   params = params || {};
-      //   return new Promise((resolve,reject)=>{
-      //       // axiso 自带 get 和 post 方法
-      //       axios.get(url,{
-      //           params,
-      //       }).then(res=>{
-      //           if(res.data.status===0){
-      //               resolve(res.data);
-      //           }else{
-      //               alert(res.data.msg)
-      //           }
-      //       }).catch(error=>{
-      //           alert('网络异常');
-      //       })
-      //   })
-      // }
-      // Promise.all([p1('',list1), p2('',list2)]).then((result) => {
-      //   console.log(result)               //['成功了', 'success']
-      // }).catch((error) => {
-      //   console.log(error)
-      // })
-      // axios.post('',list1).then(res=>{}).catch(err=>{})
-      // axios.post('',list1).then(res=>{}).catch(err=>{})
-
-      console.log('修改',list1)
-      console.log('新增',list2)
-      initData()
-    }
-
-    // 编辑
-    function onEdit(row: any) {
-      dictData.formData = {
-        name: row.name,
-        model: row.model ? row.model : "暂无字典类型"
-      };
-      commonFn(row, false);
-    }
-    // 编辑主图片
-    function editImg(item){
-      dictData.showEdit = true;
-      // item.name = "picture"
-    }
-
-    const submitEvent = () => {
-      dictData.submitLoading = true;
-      setTimeout(() => {
-        const $table = xTree.value;
-        dictData.submitLoading = false;
-        dictData.showEdit = false;
-        if (dictData.selectRow) {
-          VXETable.modal.message({ content: "保存成功", status: "success" });
-          Object.assign(dictData.selectRow, dictData.formData);
-        } else {
-          VXETable.modal.message({ content: "新增成功", status: "success" });
-          $table.insert(dictData.formData);
-        }
-      }, 500);
-    };
     function initData(){
       console.log('initData')
       // axios.get('').then(res=>{})
       setTimeout(()=>{
-        dictData.tableData=[
+        fileData.tableData=[
           {
             id: "1-1",
             name: "筋膜枪",
@@ -242,14 +136,15 @@ export default {
             mainImg:''
           }
         ]
-        // dictData.submitLoading = false;  
-        const $table = xTree.value; 
-        $table.loadData(dictData.tableData)
+        // fileData.submitLoading = false;  
+        // const $table = fileGrid.value; 
+        // debugger
+        // $table.loadData(fileData.tableData)
       },1000)
     }
     function handlePageChange1 ({ currentPage, pageSize }) {
-      dictData.tablePage1.currentPage = currentPage
-      dictData.tablePage1.pageSize = pageSize
+      fileData.tablePage1.currentPage = currentPage
+      fileData.tablePage1.pageSize = pageSize
       initData()
     }
     onMounted(()=>{
@@ -257,14 +152,10 @@ export default {
     })
 
     return {
-      ...toRefs(dictData),
-      formatDate,
-      confirmEvent,
-      submitEvent,
-      onEdit,
-      editImg,
-      onAdd,
-      onSave,submit,handlePageChange1
+      ...toRefs(fileData),
+      submit,
+      closeModal,
+      handlePageChange1
     };
   }
 };

@@ -5,6 +5,7 @@
       <template #buttons>
         <vxe-button status="primary" icon="fa fa-plus" @click="onAdd()">新增</vxe-button>
         <vxe-button status="primary" icon="fa fa-save" @click="onSave()">保存</vxe-button>
+        <vxe-button status="primary" icon="fa fa-trash-o" @click="onDelete()">删除</vxe-button>
       </template>
     </vxe-toolbar>
 
@@ -33,10 +34,10 @@
         <template #default="{ row }">
           <div class="flex">
             <div>
-              <span class="link" @click="editImg(row.files[0])" v-if="row.files[0]&&row.files[0].name!==''">
+              <span class="link" @click="editImg('files',row,0)" v-if="row.files[0]&&row.files[0].name!==''">
                 {{row.files[0]?row.files[0].name:''}}
               </span>
-              <span class="link" @click="editImg(row.files[0])" v-else>请选择</span>
+              <span class="link" @click="editImg('files',row,0)" v-else>请选择</span>
               
             </div>
             <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[0])"
@@ -44,8 +45,8 @@
           </div>
           <div class="flex">
             <div>
-              <span class="link" @click="editImg(row.files[1])" v-if="row.files[1]&&row.files[1].name!==''">{{row.files[1]?row.files[1].name:''}}</span>
-              <span class="link" @click="editImg(row.files[1])" v-else>请选择</span>
+              <span class="link" @click="editImg('files',row,1)" v-if="row.files[1]&&row.files[1].name!==''">{{row.files[1]?row.files[1].name:''}}</span>
+              <span class="link" @click="editImg('files',row,1)" v-else>请选择</span>
             </div>
             <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[1])"
             ></vxe-button> -->
@@ -54,21 +55,11 @@
       </vxe-table-column>
       <vxe-table-column title="轮播图" field="carouselFigure">
         <template #default="{ row }">
-          <div class="flex">
-            <div>
-              <span class="link" @click="editImg(row.carouselFigure[0])" v-if="row.carouselFigure[0]&&row.carouselFigure[0].name!==''">
-                {{row.carouselFigure[0]?row.carouselFigure[0].name:''}}
-              </span>
-              <span class="link" @click="editImg(row.carouselFigure[0])" v-else>请选择</span>
-              
-            </div>
+          <div v-for="item,index of row.carouselFigure" :key="index" class="flex">
+            <div>{{item.name}}</div>
+            <div class="link" @click="carouseDel(row,index)">删除</div>
           </div>
-          <div class="flex">
-            <div>
-              <span class="link" @click="editImg(row.carouselFigure[1])" v-if="row.carouselFigure[1]&&row.carouselFigure[1].name!==''">{{row.carouselFigure[1]?row.carouselFigure[1].name:''}}</span>
-              <span class="link" @click="editImg(row.carouselFigure[1])" v-else>请选择</span>
-            </div>
-          </div>
+          <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure.length)">添加</div>
         </template>
       </vxe-table-column>
       <vxe-table-column title="视频" field="videoLink">
@@ -81,30 +72,23 @@
           </div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="操作" width="100" fixed="right">
-        <template #default="{ row }">
-          <vxe-button type="text" icon="el-icon-delete" @click="confirmEvent(row)"
-            >删除</vxe-button
-          >
-        </template>
-      </vxe-table-column>
     </vxe-table>
 
     <!-- 选择图片 -->
-    <vxe-modal
+    <!-- <vxe-modal
       resize
       width="70%"
-      v-model="showEdit"
+      v-model="imgModal"
       title="选择图片"
       :loading="submitLoading"
     >
       <template #default>
-        <ModalFile ref="modal" @selectFile="selectImg" :fileType="1"></ModalFile>
+        <ModalFile ref="modal" @selectFile="selectImg" :fileType="1" :multi="true"></ModalFile>
       </template>
-    </vxe-modal>
-
+    </vxe-modal> -->
+    <ModalFile @selectFile="selectImg" @closeModal="closeModal" :fileType="1" :multi="true" :modal="imgModal"></ModalFile>
     <!-- 选择视频 -->
-    <vxe-modal
+    <!-- <vxe-modal
       resize
       width="60%"
       v-model="videoModal"
@@ -114,7 +98,7 @@
       <template #default>
         <ModalFile ref="modal" @selectFile="selectVideo" :fileType="2"></ModalFile>
       </template>
-    </vxe-modal>
+    </vxe-modal> -->
 
     
   </div>
@@ -145,9 +129,11 @@ export default {
       fileType:1,//1图片 2视频
       submitLoading: false,
       saveItem:'',
-      showEdit: false,
+      imgModal: false,
       videoModal:false,
       selectRow: null,
+      selectType: null,
+      selectIndex: null,
       filterName: "",
       tableData: [
       ],
@@ -163,33 +149,33 @@ export default {
       return XEUtils.toDateString(value, "yyyy-MM-dd HH:mm:ss.S");
     };
 
-    const confirmEvent = async (row) => {
+    const onDelete = async () => {
+      const $table = xTree.value;
+      const selectRecords = $table.getCheckboxRecords()
+      if(selectRecords.length===0){
+        VXETable.modal.message({ content: "请勾选数据", status: "success" })
+        return
+      }
+
       const type = await VXETable.modal.confirm("您确定要删除吗？");
       if(await type!=='confirm')return
-      let index:number
-      for(let i=0 ; i < dictData.tableData.length;i++){
-        if(dictData.tableData[i].id===row.id){
-          index = i
-        }
-      }
-      dictData.tableData.splice(index,1)
-      setTimeout(() => {
-        const $table = xTree.value;
-        $table.loadData(dictData.tableData)
-        VXETable.modal.message({ content: "删除成功", status: "success" })
-        // initData()
-      }, 500)
+      // let index:number
+      // for(let i=0 ; i < dictData.tableData.length;i++){
+      //   if(dictData.tableData[i].id===row.id){
+      //     index = i
+      //   }
+      // }
+      // dictData.tableData.splice(index,1)
+      // setTimeout(() => {
+      //   const $table = xTree.value;
+      //   $table.loadData(dictData.tableData)
+      //   VXETable.modal.message({ content: "删除成功", status: "success" })
+      //   initData()
+      // }, 500)
     };
-
-    function commonFn(value, disabled) {
-      dictData.selectRow = value;
-      dictData.showEdit = true;
-      // dictData.formItems[1].itemRender.props.disabled = disabled;
-    }
 
     // 新增
     function onAdd() {
-      // router.push("/product/addProduct")
       const $table = xTree.value;
       $table.insert({
             // id: "1-2",
@@ -270,12 +256,16 @@ export default {
     }
 
     // 编辑主图片
-    function editImg(item){
-      dictData.showEdit = true;
-      // const modalRef = modal.value;
-      // modalRef
-      // item.name = "picture"
-      // dictData.saveItem = item.name
+    function editImg(type,row,index){
+      console.log('row',row)
+      console.log('type',type)
+      console.log('index',index)
+      console.log(row[type][index])
+      dictData.selectRow = row 
+      dictData.selectType = type 
+      dictData.selectIndex = index
+
+      dictData.imgModal = true;
     }
     // 编辑视频地址
     function editVideo(item){
@@ -285,10 +275,24 @@ export default {
       // item.name = "picture"
       // dictData.saveItem = item.name
     }
+    function carouseDel(row,index){
+      row.carouselFigure.splice(index,1)
+    }
     const selectImg = (data) =>{
-      dictData.showEdit = false;
+      dictData.imgModal = false;
+      if(dictData.selectRow[dictData.selectType][dictData.selectIndex]===undefined){
+        dictData.selectRow[dictData.selectType][dictData.selectIndex]={
+          name:data[0].name
+        }
+      }else{     
+        dictData.selectRow[dictData.selectType][dictData.selectIndex].name = data[0].name
+      }
       console.log('data',data)
-      dictData.saveItem = data.name
+      // dictData.saveItem = data.name
+    }
+
+    const closeModal = ()=>{
+      dictData.imgModal = false;
     }
 
     const selectVideo = (data) =>{
@@ -320,7 +324,16 @@ export default {
                 url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
               }
             ],
-            carouselFigure:[],
+            carouselFigure:[
+              {
+                name:'img1',
+                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+              },
+              {
+                name:'img2',
+                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+              }
+            ],
             videoLink:'',
           },
           {
@@ -349,8 +362,9 @@ export default {
           }
         ]
         // dictData.submitLoading = false;  
-        const $table = xTree.value; 
-        $table.loadData(dictData.tableData)
+        // const $table = xTree.value; 
+        // debugger
+        // $table.loadData(dictData.tableData)
       },1000)
     }
     onMounted(()=>{
@@ -360,13 +374,15 @@ export default {
     return {
       ...toRefs(dictData),
       formatDate,
-      confirmEvent,
+      onDelete,
       editImg,
       editVideo,
       onAdd,
       onSave,
       selectImg,
-      selectVideo
+      closeModal,
+      selectVideo,
+      carouseDel
     };
   }
 };
