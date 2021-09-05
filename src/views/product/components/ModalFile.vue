@@ -9,6 +9,21 @@
       :loading="submitLoading"
       @close="closeModal"
     >
+    <vxe-form :data="formData" @submit="searchEvent" @reset="resetEvent">
+      <vxe-form-item title="名称" field="name" :item-render="{}">
+        <template #default="{ data }">
+          <vxe-input v-model="data.name" placeholder="请输入名称" clearable></vxe-input>
+        </template>
+      </vxe-form-item>
+     
+      <vxe-form-item>
+        <template #default>
+          <vxe-button type="submit" status="primary">搜索</vxe-button>
+          <vxe-button type="reset" >重置</vxe-button>
+        </template>
+      </vxe-form-item>
+    </vxe-form>
+
     <vxe-table
       ref="fileGrid"
       border
@@ -18,13 +33,15 @@
     >
       <vxe-column type="checkbox" width="60">
       </vxe-column>
-      <vxe-table-column title="文件名称" field="name">
+      <vxe-table-column title="文件名称" field="fileName">
       </vxe-table-column>
       <vxe-table-column title="描述" field="description">
       </vxe-table-column>
-      <vxe-table-column title="预览" field="mainImg">
+      <vxe-table-column title="预览" field="filePath">
         <template #default="{ row }">
-          <img class="img" :src="row.mainImg" alt="">
+          <!-- <img class="img" :src="baseURL+row.filePath" alt=""> -->
+          <img v-if="row.fileType=='1'" class="img" :src="baseURL+row.filePath" alt="">
+          <video v-else class="img" :src="baseURL+row.filePath" alt=""></video>
         </template>
       </vxe-table-column>
     </vxe-table>
@@ -51,6 +68,7 @@ import axios from 'axios';
 import { useRoute, useRouter, RouteLocationMatched } from "vue-router";
 import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
+import { http } from "../../../utils/http";
 import {
   VXETable,
   VxeTableInstance,
@@ -94,57 +112,78 @@ export default {
       loading:false,
       tableData: [
       ],
-      formData: {
-        name: "",
-        model: ""
-      },
       tablePage1: {
-                currentPage: 1,
-                pageSize: 10,
-                totalResult: 33
-              }
+        currentPage: 1,
+        pageSize: 10,
+        totalResult: 0
+      },
+      baseURL:'http://47.106.86.150',
+      formData:{},
     });
 
     const fileGrid = templateRef<HTMLElement | any>("fileGrid", null);
 
     function initData(){
-      console.log('initData')
-      // axios.get('').then(res=>{})
-      setTimeout(()=>{
-        fileData.tableData=[
-          {
-            id: "1-1",
-            name: "筋膜枪",
-            title:'',
-            description: "serviceStatus",
-            mainImg:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              
-          },
-          {
-            id: "1-2",
-            name: "跳绳",
-            title:'',
-            description: "onlienStatus",
-            mainImg:''
-
-          },
-          { 
-            id: 2, 
-            name: "体脂秤", 
-            title:'',
-            description: "operatingSystem" ,
-            mainImg:''
-          }
-        ]
-        // fileData.submitLoading = false;  
-        // const $table = fileGrid.value; 
-        // debugger
-        // $table.loadData(fileData.tableData)
-      },1000)
+      http.request("post", "http://47.106.86.150:8082/rest/api/file/v1/query/list",
+      {
+        request:{
+          fileName:fileData.formData.name,
+          fileType:props.fileType
+        },
+        pageSize:fileData.tablePage1.pageSize,
+        pageNum:fileData.tablePage1.currentPage
+        
+      })
+      .then(res=>{
+        fileData.tableData = res.data.list
+        fileData.tablePage1.totalResult = res.data.total
+      })
+      .catch(err=>{})
+      // setTimeout(()=>{
+      //   fileData.tableData=[
+      //     {
+      //       id: "1-1",
+      //       fileName: "筋膜枪",
+      //       title:'',
+      //       description: "serviceStatus",
+      //       fileSize:"1024kb",
+      //       fileType:1,
+      //       filePath:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2',
+      //       remark:'' 
+      //     },
+      //     {
+      //       id: "1-2",
+      //       fileName: "跳绳",
+      //       title:'',
+      //       description: "onlienStatus",
+      //       fileSize:"1024kb",
+      //       filePath:'',
+      //       fileType:1,
+      //       remark:'' 
+      //     },
+      //     { 
+      //       id: 2, 
+      //       fileName: "体脂秤", 
+      //       title:'',
+      //       description: "operatingSystem" ,
+      //       fileSize:"1024kb",
+      //       filePath:'',
+      //       fileType:1,
+      //       remark:'' 
+      //     }
+      //   ]
+      // },1000)
     }
     function handlePageChange1 ({ currentPage, pageSize }) {
       fileData.tablePage1.currentPage = currentPage
       fileData.tablePage1.pageSize = pageSize
+      initData()
+    }
+    function searchEvent(){
+      initData()
+    }
+    function resetEvent(){
+      fileData.formData.name = ''
       initData()
     }
     onMounted(()=>{
@@ -155,7 +194,9 @@ export default {
       ...toRefs(fileData),
       submit,
       closeModal,
-      handlePageChange1
+      handlePageChange1,
+      searchEvent,
+      resetEvent
     };
   }
 };
@@ -182,8 +223,8 @@ export default {
   }
 }
 .img{
-  // width: 100px;
-  height: 80px;
+  max-width: 100px;
+  max-height: 100px;
 }
 .flex{
   // display:flex;

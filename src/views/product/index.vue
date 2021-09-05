@@ -22,30 +22,28 @@
       </vxe-table-column>
       <vxe-table-column title="标题" field="title" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="描述" field="des" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="描述" field="desc" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
       <vxe-table-column title="商城链接" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="首页顺序" field="sortForHome" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="首页顺序" field="sortForHome" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="智能硬件顺序" field="sortForMenu3" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="智能硬件顺序" field="sortForMenu3" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
       <vxe-table-column title="主图片" field="files">
         <template #default="{ row }">
           <div class="flex">
             <div>
-              <span class="link" @click="editImg('files',row,0)" v-if="row.files[0]&&row.files[0].name!==''">
-                {{row.files[0]?row.files[0].name:''}}
+              <span class="link" @click="editImg('files',row,0)" v-if="row.files[0]&&row.files[0].fileName!==''">
+                {{row.files[0]?row.files[0].fileName:''}}
               </span>
               <span class="link" @click="editImg('files',row,0)" v-else>请选择</span>
               
             </div>
-            <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[0])"
-            ></vxe-button> -->
           </div>
           <div class="flex">
             <div>
-              <span class="link" @click="editImg('files',row,1)" v-if="row.files[1]&&row.files[1].name!==''">{{row.files[1]?row.files[1].name:''}}</span>
+              <span class="link" @click="editImg('files',row,1)" v-if="row.files[1]&&row.files[1].fileName!==''">{{row.files[1]?row.files[1].fileName:''}}</span>
               <span class="link" @click="editImg('files',row,1)" v-else>请选择</span>
             </div>
             <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[1])"
@@ -56,49 +54,36 @@
       <vxe-table-column title="轮播图" field="carouselFigure">
         <template #default="{ row }">
           <div v-for="item,index of row.carouselFigure" :key="index" class="flex">
-            <div>{{item.name}}</div>
+            <div>{{item.fileName}}</div>
             <div class="link" @click="carouseDel(row,index)">删除</div>
           </div>
           <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure.length)">添加</div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="视频" field="videoLink">
+      <vxe-table-column title="视频" field="videoName">
         <template #default="{ row }">
-          <div v-if="row.videoLink && row.videoLink!==''" @click="editVideo" class="link" >
-            {{row.videoLink}}
+          <div v-if="row.videoName && row.videoName!==''" @click="editVideo('videoName',row)" class="link" >
+            {{row.videoName}}
           </div>
-          <div v-else @click="editVideo" class="link" >
+          <div v-else @click="editVideo('videoName',row)" class="link" >
             请选择
           </div>
         </template>
       </vxe-table-column>
     </vxe-table>
+    <vxe-pager
+      :loading="loading"
+      :current-page="tablePage.currentPage"
+      :page-size="tablePage.pageSize"
+      :total="tablePage.totalResult"
+      :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
+      @page-change="handlePageChange">
+    </vxe-pager>
 
     <!-- 选择图片 -->
-    <!-- <vxe-modal
-      resize
-      width="70%"
-      v-model="imgModal"
-      title="选择图片"
-      :loading="submitLoading"
-    >
-      <template #default>
-        <ModalFile ref="modal" @selectFile="selectImg" :fileType="1" :multi="true"></ModalFile>
-      </template>
-    </vxe-modal> -->
-    <ModalFile @selectFile="selectImg" @closeModal="closeModal" :fileType="1" :multi="true" :modal="imgModal"></ModalFile>
+    <ModalFile @selectFile="selectImg" @closeModal="closeModal" :fileType="1" :multi="false" v-if="imgModal" :modal="imgModal"></ModalFile>
     <!-- 选择视频 -->
-    <!-- <vxe-modal
-      resize
-      width="60%"
-      v-model="videoModal"
-      title="选择视频"
-      :loading="submitLoading"
-    >
-      <template #default>
-        <ModalFile ref="modal" @selectFile="selectVideo" :fileType="2"></ModalFile>
-      </template>
-    </vxe-modal> -->
+    <ModalFile @selectFile="selectVideo" @closeModal="closeModal" :fileType="2" :multi="false" v-if="videoModal" :modal="videoModal"></ModalFile>
 
     
   </div>
@@ -108,8 +93,8 @@ import { reactive, ref, unref, nextTick, toRefs,onMounted } from "vue";
 import { useRoute, useRouter, RouteLocationMatched } from "vue-router";
 import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
-import axios from 'axios';
 import ModalFile from './components/ModalFile.vue'
+import { http } from "../../utils/http";
 import {
   VXETable,
   VxeTableInstance,
@@ -128,18 +113,18 @@ export default {
     const dictData = reactive({
       fileType:1,//1图片 2视频
       submitLoading: false,
-      saveItem:'',
       imgModal: false,
       videoModal:false,
       selectRow: null,
       selectType: null,
       selectIndex: null,
-      filterName: "",
       tableData: [
       ],
-      formData: {
-        name: "",
-        model: ""
+      loading:false,
+      tablePage: {
+        currentPage: 1,
+        pageSize: 10,
+        totalResult: 0
       }
     });
 
@@ -159,34 +144,31 @@ export default {
 
       const type = await VXETable.modal.confirm("您确定要删除吗？");
       if(await type!=='confirm')return
-      // let index:number
-      // for(let i=0 ; i < dictData.tableData.length;i++){
-      //   if(dictData.tableData[i].id===row.id){
-      //     index = i
-      //   }
-      // }
-      // dictData.tableData.splice(index,1)
-      // setTimeout(() => {
-      //   const $table = xTree.value;
-      //   $table.loadData(dictData.tableData)
-      //   VXETable.modal.message({ content: "删除成功", status: "success" })
-      //   initData()
-      // }, 500)
+      let ids = selectRecords.map(item=>{
+        return item.id
+      })
+      http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/delete",ids)
+      .then(res=>{
+        console.log('res',res)
+        initData()
+      })
+      .catch(err=>{})
     };
 
     // 新增
     function onAdd() {
       const $table = xTree.value;
       $table.insert({
-            // id: "1-2",
+            id: 0,
             name: "",
             title:'',
-            des: "",
+            desc: "",
             mallLink:'',
             sortForHome:'',
             sortForMenu3:'',
             files:[],
             carouselFigure:[],
+            videoName:'',
             videoLink:''
           },);
     }
@@ -202,57 +184,29 @@ export default {
       let list1 = []
       let list2 = []
       for(let item of selectRecords){
-        if(item.id){
-          list1.push(item)//修改
+        if(item.id&&item.id!==0){
+          list2.push(item)//修改
         }else{
-          list2.push(item)//新增
+          list1.push(item)//新增
         }
       }
-      // let p1 = (url,params)=>{
-      //   params = params || {};
-      //   return new Promise((resolve,reject)=>{
-      //       // axiso 自带 get 和 post 方法
-      //       axios.get(url,{
-      //           params,
-      //       }).then(res=>{
-      //           if(res.data.status===0){
-      //               resolve(res.data);
-      //           }else{
-      //               alert(res.data.msg)
-      //           }
-      //       }).catch(error=>{
-      //           alert('网络异常');
-      //       })
-      //   })
-      // }
-      // let p2 = (url,params)=>{
-      //   params = params || {};
-      //   return new Promise((resolve,reject)=>{
-      //       // axiso 自带 get 和 post 方法
-      //       axios.get(url,{
-      //           params,
-      //       }).then(res=>{
-      //           if(res.data.status===0){
-      //               resolve(res.data);
-      //           }else{
-      //               alert(res.data.msg)
-      //           }
-      //       }).catch(error=>{
-      //           alert('网络异常');
-      //       })
-      //   })
-      // }
-      // Promise.all([p1('',list1), p2('',list2)]).then((result) => {
-      //   console.log(result)               //['成功了', 'success']
-      // }).catch((error) => {
-      //   console.log(error)
-      // })
-      // axios.post('',list1).then(res=>{}).catch(err=>{})
-      // axios.post('',list1).then(res=>{}).catch(err=>{})
-
-      console.log('修改',list1)
-      console.log('新增',list2)
-      initData()
+      if(list1.length>0){
+        http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/add",list1)
+        .then(res=>{
+          console.log('res',res)
+          initData()
+        })
+        .catch(err=>{})
+      }
+      if(list2.length>0){
+        http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/modify",list2)
+        .then(res=>{
+          console.log('res',res)
+          initData()
+        })
+        .catch(err=>{})
+      }
+      
     }
 
     // 编辑主图片
@@ -268,12 +222,11 @@ export default {
       dictData.imgModal = true;
     }
     // 编辑视频地址
-    function editVideo(item){
+    function editVideo(type,row){
+      dictData.selectRow = row 
+      dictData.selectType = type 
+      
       dictData.videoModal = true;
-      // const modalRef = modal.value;
-      // modalRef
-      // item.name = "picture"
-      // dictData.saveItem = item.name
     }
     function carouseDel(row,index){
       row.carouselFigure.splice(index,1)
@@ -282,90 +235,106 @@ export default {
       dictData.imgModal = false;
       if(dictData.selectRow[dictData.selectType][dictData.selectIndex]===undefined){
         dictData.selectRow[dictData.selectType][dictData.selectIndex]={
-          name:data[0].name
+          fileName:data[0].fileName,
+          filePath:data[0].filePath,
+          id:data[0].id
         }
       }else{     
-        dictData.selectRow[dictData.selectType][dictData.selectIndex].name = data[0].name
+        dictData.selectRow[dictData.selectType][dictData.selectIndex].fileName = data[0].fileName
+        dictData.selectRow[dictData.selectType][dictData.selectIndex].filePath = data[0].filePath
+        dictData.selectRow[dictData.selectType][dictData.selectIndex].id = data[0].id
       }
-      console.log('data',data)
-      // dictData.saveItem = data.name
+      console.log('selectImg',data)
     }
 
     const closeModal = ()=>{
       dictData.imgModal = false;
+      dictData.videoModal = false;
     }
 
     const selectVideo = (data) =>{
-      // dictData.videoModal = false;
-      // console.log('data',data)
-      // dictData.saveItem = data.name
+      dictData.videoModal = false;
+      dictData.selectRow.videoName = data[0].fileName
+      dictData.selectRow.videoLink = data[0].filePath
+      console.log('selectImg',data)
     }
 
     function initData(){
-      console.log('initData')
-      // axios.get('').then(res=>{})
-      setTimeout(()=>{
-        dictData.tableData=[
-          {
-            id: "1-1",
-            name: "筋膜枪",
-            title:'',
-            des: "serviceStatus",
-            mallLink:'',
-            sortForHome:'',
-            sortForMenu3:'',
-            files:[
-              {
-                name:'img1',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              },
-              {
-                name:'img2',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              }
-            ],
-            carouselFigure:[
-              {
-                name:'img1',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              },
-              {
-                name:'img2',
-                url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
-              }
-            ],
-            videoLink:'',
-          },
-          {
-            id: "1-2",
-            name: "跳绳",
-            title:'',
-            des: "onlienStatus",
-            mallLink:'',
-            sortForHome:'',
-            sortForMenu3:'',
-            files:[],
-            carouselFigure:[],
-            videoLink:''
-          },
-          { 
-            id: 2, 
-            name: "体脂秤", 
-            title:'',
-            des: "operatingSystem",
-            mallLink:'',
-            sortForHome:'',
-            sortForMenu3:'',
-            files:[],
-            carouselFigure:[],
-            videoLink:'' 
-          }
-        ]
-        // dictData.submitLoading = false;  
-        // const $table = xTree.value; 
-        // debugger
-        // $table.loadData(dictData.tableData)
-      },1000)
+      http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/query/list",
+      {
+        pageSize:dictData.tablePage.pageSize,
+        pageNum:dictData.tablePage.currentPage
+        
+      }
+      )
+      .then(res=>{
+        dictData.tableData = res.data.list
+        dictData.tablePage.totalResult = res.data.total
+      })
+      .catch(err=>{})
+      // setTimeout(()=>{
+      //   dictData.tableData=[
+      //     {
+      //       id: "1-1",
+      //       name: "筋膜枪",
+      //       title:'',
+      //       desc: "serviceStatus",
+      //       mallLink:'',
+      //       sortForHome:'',
+      //       sortForMenu3:'',
+      //       files:[
+      //         {
+      //           name:'img1',
+      //           url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+      //         },
+      //         {
+      //           name:'img2',
+      //           url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+      //         }
+      //       ],
+      //       carouselFigure:[
+      //         {
+      //           name:'img1',
+      //           url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+      //         },
+      //         {
+      //           name:'img2',
+      //           url:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2'
+      //         }
+      //       ],
+      //       videoLink:'',
+      //     },
+      //     {
+      //       id: "1-2",
+      //       name: "跳绳",
+      //       title:'',
+      //       desc: "onlienStatus",
+      //       mallLink:'',
+      //       sortForHome:'',
+      //       sortForMenu3:'',
+      //       files:[],
+      //       carouselFigure:[],
+      //       videoLink:''
+      //     },
+      //     { 
+      //       id: 2, 
+      //       name: "体脂秤", 
+      //       title:'',
+      //       desc: "operatingSystem",
+      //       mallLink:'',
+      //       sortForHome:'',
+      //       sortForMenu3:'',
+      //       files:[],
+      //       carouselFigure:[],
+      //       videoLink:'' 
+      //     }
+      //   ]
+      // },1000)
+    }
+    function handlePageChange ({ currentPage, pageSize }) {
+      dictData.tablePage.currentPage = currentPage
+      dictData.tablePage.pageSize = pageSize
+      initData()
     }
     onMounted(()=>{
       initData()
@@ -382,7 +351,8 @@ export default {
       selectImg,
       closeModal,
       selectVideo,
-      carouseDel
+      carouseDel,
+      handlePageChange
     };
   }
 };

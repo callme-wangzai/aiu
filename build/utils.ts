@@ -10,6 +10,7 @@ export interface ViteEnv {
 
 export function loadEnv(): ViteEnv {
   const env = process.env.NODE_ENV;
+  console.log('env',env)
   const ret: any = {};
   // eslint-disable-next-line no-sparse-arrays
   const envList = [`.env.${env}.local`, `.env.${env}`, ".env.local", ".env", ,];
