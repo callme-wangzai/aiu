@@ -147,7 +147,7 @@ export default {
       let ids = selectRecords.map(item=>{
         return item.id
       })
-      http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/delete",ids)
+      http.request("post", "/rest/api/product/v1/batch/delete",ids)
       .then(res=>{
         console.log('res',res)
         initData()
@@ -191,7 +191,7 @@ export default {
         }
       }
       if(list1.length>0){
-        http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/add",list1)
+        http.request("post", "/rest/api/product/v1/batch/add",list1)
         .then(res=>{
           console.log('res',res)
           initData()
@@ -199,7 +199,7 @@ export default {
         .catch(err=>{})
       }
       if(list2.length>0){
-        http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/batch/modify",list2)
+        http.request("post", "/rest/api/product/v1/batch/modify",list2)
         .then(res=>{
           console.log('res',res)
           initData()
@@ -260,7 +260,7 @@ export default {
     }
 
     function initData(){
-      http.request("post", "http://47.106.86.150:8082/rest/api/product/v1/query/list",
+      http.request("post", "/rest/api/product/v1/query/list",
       {
         pageSize:dictData.tablePage.pageSize,
         pageNum:dictData.tablePage.currentPage

@@ -10,7 +10,7 @@
     >
       <el-upload
         class="upload-demo"
-        action="http://47.106.86.150:8082/rest/api/file/v1/upload"
+        action="/rest/api/file/v1/upload"
         :on-preview="handlePreview"
         :on-success="uploadSuccess"
         :on-remove="handleRemove"
@@ -74,7 +74,7 @@ export default {
           remark:''
         }
       })
-      http.request("post", "http://47.106.86.150:8082/rest/api/file/v1/batch/save",fileDtos)
+      http.request("post", "/rest/api/file/v1/batch/save",fileDtos)
       .then(res=>{
         console.log('res',res)
         // initData()

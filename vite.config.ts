@@ -47,7 +47,12 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
       port: VITE_PORT,
       host: "0.0.0.0",
       // 本地跨域代理
-      proxy: createProxy(VITE_PROXY)
+      proxy: {
+        '/rest': {
+          target: process.env.NODE_ENV === "production" ? '':'http://47.106.86.150:8082/', // 凡是遇到 /api 路径的请求，都映射到 target 属性
+          changeOrigin: true,
+        }
+      }
     },
     plugins: [
       vue(),

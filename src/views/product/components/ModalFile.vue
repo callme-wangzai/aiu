@@ -124,7 +124,7 @@ export default {
     const fileGrid = templateRef<HTMLElement | any>("fileGrid", null);
 
     function initData(){
-      http.request("post", "http://47.106.86.150:8082/rest/api/file/v1/query/list",
+      http.request("post", "/rest/api/file/v1/query/list",
       {
         request:{
           fileName:fileData.formData.name,
