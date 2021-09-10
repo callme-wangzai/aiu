@@ -47,7 +47,7 @@ export default defineComponent({
           // } as unknown as RouteLocationMatched
         ].concat(matched);
       }
-      if(matched[0].path===matched[1].path){
+      if(matched[0]&&matched[1]&&matched[0].path===matched[1].path){
         matched=[matched[1]]
       }
       levelList.value = matched.filter(

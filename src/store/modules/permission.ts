@@ -13,7 +13,7 @@ export const usePermissionStore = defineStore({
   actions: {
     asyncActionRoutes(routes) {
       if (this.wholeRoutes.length > 0) return;
-      this.wholeRoutes = ascending(this.constantRoutes.concat(routes)).filter(
+      this.wholeRoutes = ascending(this.constantRoutes).filter(
         v => v.meta.showLink
       );
 

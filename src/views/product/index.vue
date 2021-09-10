@@ -60,10 +60,10 @@
           <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure.length)">添加</div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="视频" field="videoName">
+      <vxe-table-column title="视频" field="video">
         <template #default="{ row }">
-          <div v-if="row.videoName && row.videoName!==''" @click="editVideo('videoName',row)" class="link" >
-            {{row.videoName}}
+          <div v-if="row.video && row.video.fileName && row.video.fileName!==''" @click="editVideo('videoName',row)" class="link" >
+            {{row.video.fileName}}
           </div>
           <div v-else @click="editVideo('videoName',row)" class="link" >
             请选择
@@ -168,8 +168,7 @@ export default {
             sortForMenu3:'',
             files:[],
             carouselFigure:[],
-            videoName:'',
-            videoLink:''
+            video:null
           },);
     }
 
@@ -254,8 +253,9 @@ export default {
 
     const selectVideo = (data) =>{
       dictData.videoModal = false;
-      dictData.selectRow.videoName = data[0].fileName
-      dictData.selectRow.videoLink = data[0].filePath
+      // dictData.selectRow.videoName = data[0].fileName
+      // dictData.selectRow.videoLink = data[0].filePath
+      dictData.selectRow.video = data[0]
       console.log('selectImg',data)
     }
 
@@ -264,7 +264,7 @@ export default {
       {
         pageSize:dictData.tablePage.pageSize,
         pageNum:dictData.tablePage.currentPage
-        
+
       }
       )
       .then(res=>{

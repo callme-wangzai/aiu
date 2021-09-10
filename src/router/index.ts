@@ -4,6 +4,7 @@ import homeRouter from "./modules/home";
 import flowChartRouter from "./modules/flowchart";
 import fileRouter from "./modules/file";
 import productRouter from "./modules/product";
+import accountRouter from "./modules/account";
 import bannerRouter from "./modules/banner";
 import editorRouter from "./modules/editor";
 import componentsRouter from "./modules/components";
@@ -23,16 +24,17 @@ import Layout from "/@/layout/index.vue";
 const modulesRoutes = import.meta.glob("/src/views/*/*/*.vue");
 
 const constantRoutes: Array<any> = [
-  homeRouter,
-  fileRouter,
+  // homeRouter,
   productRouter,
-  bannerRouter,
-  flowChartRouter,
-  editorRouter,
-  componentsRouter,
-  nestedRouter,
-  externalLink,
-  errorRouter
+  fileRouter,
+  accountRouter,
+  // bannerRouter,
+  // flowChartRouter,
+  // editorRouter,
+  // componentsRouter,
+  // nestedRouter,
+  // externalLink,
+  // errorRouter
 ];
 
 // 按照路由中meta下的rank等级升序来排序路由

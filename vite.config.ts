@@ -42,9 +42,9 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
       https: false,
       /**
        * 端口号
-       * @default 3000
+       * @default 3001
        */
-      port: VITE_PORT,
+      port: 3001,
       host: "0.0.0.0",
       // 本地跨域代理
       proxy: {

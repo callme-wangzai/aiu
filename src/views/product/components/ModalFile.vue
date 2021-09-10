@@ -4,6 +4,7 @@
     <vxe-modal
       resize
       width="70%"
+      height="80%"
       v-model="modal"
       :title="fileType===1?'选择图片':'选择视频'"
       :loading="submitLoading"

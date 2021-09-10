@@ -6,7 +6,7 @@ const productRouter = {
   component: Layout,
   redirect: "/product",
   meta: {
-    icon: "el-icon-set-up",
+    icon: "el-icon-sell",
     title: "message.hsproduct",
     showLink: true,
     savedPosition: true,

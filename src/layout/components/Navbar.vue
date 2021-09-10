@@ -12,7 +12,7 @@
       <!-- 全屏 -->
       <screenfull v-show="!deviceDetection()" />
       <!-- 国际化 -->
-      <div
+      <!-- <div
         v-show="!deviceDetection()"
         class="inter"
         :title="currentLocale ? '中文' : 'English'"
@@ -24,7 +24,7 @@
         class="el-icon-setting hsset"
         :title="$t('message.hssystemSet')"
         @click="onPanel"
-      ></i>
+      ></i> -->
       <!-- 退出登陆 -->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">

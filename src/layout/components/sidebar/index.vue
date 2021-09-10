@@ -12,10 +12,12 @@
       >
         <sidebar-item
           v-for="route in routeStore.wholeRoutes"
+          v-show="!(usename!=='admin'&&route.name==='account')"
           :key="route.path"
           :item="route"
           :base-path="route.path"
         />
+        
       </el-menu>
     </el-scrollbar>
   </div>
@@ -31,12 +33,14 @@ import { emitter } from "/@/utils/mitt";
 import Logo from "./Logo.vue";
 import { storageLocal } from "/@/utils/storage";
 import { usePermissionStoreHook } from "/@/store/modules/permission";
-
+import { storageSession } from "/@/utils/storage";
 export default defineComponent({
   name: "sidebar",
   components: { SidebarItem, Logo },
   setup() {
     const routeStore = usePermissionStoreHook();
+    
+    let usename = storageSession.getItem("info")?.username;
 
     const router = useRouter().options.routes;
 
@@ -81,6 +85,7 @@ export default defineComponent({
       emitter.on("logoChange", key => {
         showLogo.value = key;
       });
+      
     });
 
     return {
@@ -88,7 +93,8 @@ export default defineComponent({
       isCollapse: computed(() => !pureApp.getSidebarStatus),
       menuSelect,
       showLogo,
-      routeStore
+      routeStore,
+      usename
     };
   }
 });

@@ -19,26 +19,11 @@
           prefix-icon="el-icon-lock"
         ></el-input>
       </el-form-item>
-      <el-form-item prop="verify">
-        <el-input
-          maxlength="2"
-          onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"
-          v-model.number="model.verify"
-          placeholder="请输入验证码"
-        ></el-input>
-        <span
-          class="verify"
-          title="刷新"
-          v-html="model.svg"
-          @click.prevent="refreshVerify"
-        ></span>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click.prevent="onBehavior">{{
           tipsFalse
         }}</el-button>
         <el-button @click="resetForm">重置</el-button>
-        <span class="tips" @click="changPage">{{ tips }}</span>
       </el-form-item>
       <span title="测试用户 直接登录" class="secret" @click="noSecret"
         >免密登录</span
@@ -63,7 +48,6 @@ import { storageSession } from "/@/utils/storage";
 export interface ContextProps {
   userName: string;
   passWord: string;
-  verify: number | null;
   svg: any;
   telephone?: number;
   dynamicText?: string;
@@ -81,7 +65,7 @@ export default defineComponent({
       require: true
     }
   },
-  emits: ["onBehavior", "refreshVerify"],
+  emits: ["onBehavior"],
   setup(props, ctx) {
     let vm: any;
 
@@ -107,11 +91,7 @@ export default defineComponent({
       userName: [{ required: true, message: "请输入用户名", trigger: "blur" }],
       passWord: [
         { required: true, message: "请输入密码", trigger: "blur" },
-        { min: 6, message: "密码长度必须不小于6位", trigger: "blur" }
-      ],
-      verify: [
-        { required: true, message: "请输入验证码", trigger: "blur" },
-        { type: "number", message: "验证码必须是数字类型", trigger: "blur" }
+        // { min: 6, message: "密码长度必须不小于6位", trigger: "blur" }
       ]
     });
 
@@ -126,19 +106,9 @@ export default defineComponent({
       });
     };
 
-    // 刷新验证码
-    const refreshVerify = (): void => {
-      ctx.emit("refreshVerify");
-    };
-
     // 表单重置
     const resetForm = (): void => {
       vm.refs.ruleForm.resetFields();
-    };
-
-    // 登录、注册页面切换
-    const changPage = (): void => {
-      tips.value === "注册" ? router.push("/register") : router.push("/login");
     };
 
     const noSecret = (): void => {
@@ -161,8 +131,6 @@ export default defineComponent({
       tipsFalse,
       resetForm,
       onBehavior,
-      refreshVerify,
-      changPage,
       noSecret
     };
   }
@@ -172,7 +140,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .info {
   width: 30vw;
-  height: 48vh;
+  height: 35vh;
   background: url("../../assets/login.png") no-repeat center;
   background-size: cover;
   position: absolute;
@@ -189,13 +157,6 @@ export default defineComponent({
   }
   .rule-form {
     width: 80%;
-    .verify {
-      position: absolute;
-      margin: -10px 0 0 -120px;
-      &:hover {
-        cursor: pointer;
-      }
-    }
     .tips {
       color: #409eff;
       float: right;

@@ -6,7 +6,7 @@ const fileRouter = {
   component: Layout,
   redirect: "/file",
   meta: {
-    icon: "el-icon-set-up",
+    icon: "el-icon-files",
     title: "message.hsfile",
     showLink: true,
     savedPosition: true,

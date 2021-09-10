@@ -3,7 +3,6 @@
     <info
       :ruleForm="contextInfo"
       @on-behavior="onLogin"
-      @refreshVerify="refreshVerify"
     />
   </div>
 </template>
@@ -15,6 +14,10 @@ import { getVerify, getLogin } from "/@/api/user";
 import { useRouter } from "vue-router";
 import { storageSession } from "/@/utils/storage";
 import { warnMessage, successMessage } from "/@/utils/message";
+import { http } from "/@/utils/http";
+import {
+  VXETable,
+} from "vxe-table";
 export default {
   name: "login",
   components: {
@@ -22,12 +25,6 @@ export default {
   },
   setup() {
     const router = useRouter();
-
-    // 刷新验证码
-    const refreshGetVerify = async () => {
-      let { svg } = await getVerify();
-      contextInfo.svg = svg;
-    };
 
     const contextInfo: ContextProps = reactive({
       userName: "",
@@ -38,28 +35,40 @@ export default {
 
     const toPage = (info: Object): void => {
       storageSession.setItem("info", info);
-      router.push("/");
+      router.push("/product");
     };
 
     // 登录
     const onLogin = async () => {
-      let { userName, passWord, verify } = contextInfo;
-      let { code, info, accessToken } = await getLogin({
+      let { userName, passWord } = contextInfo;
+      // let { code, info, accessToken } = await getLogin({
+      //   username: userName,
+      //   password: passWord
+      // });
+      // code === 0
+      //   ? successMessage(info) &&
+      //     toPage({
+      //       username: userName,
+      //       accessToken
+      //     })
+      //   : warnMessage(info);
+      http.request("post", "/rest/api/user/v1/login",{
         username: userName,
-        password: passWord,
-        verify: verify
-      });
-      code === 0
-        ? successMessage(info) &&
-          toPage({
-            username: userName,
-            accessToken
-          })
-        : warnMessage(info);
-    };
-
-    const refreshVerify = (): void => {
-      refreshGetVerify();
+        password: passWord
+      })
+        .then(res=>{
+          console.log('res',res)
+          if(res.code==0){
+            VXETable.modal.message({ content: res.msg, status: "success" })
+            toPage({
+              username: userName,
+            })
+          }else{
+            VXETable.modal.message({ content: res.msg , status: "warning" })
+          }
+          
+        })
+        .catch(err=>{})
     };
 
     onBeforeMount(() => {
@@ -70,8 +79,7 @@ export default {
       contextInfo,
       onLogin,
       router,
-      toPage,
-      refreshVerify
+      toPage
     };
   }
 };
