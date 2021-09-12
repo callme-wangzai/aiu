@@ -57,7 +57,7 @@
             <div>{{item.fileName}}</div>
             <div class="link" @click="carouseDel(row,index)">删除</div>
           </div>
-          <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure.length)">添加</div>
+          <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure&&row.carouselFigure.length)">添加</div>
         </template>
       </vxe-table-column>
       <vxe-table-column title="视频" field="video">
@@ -232,18 +232,11 @@ export default {
     }
     const selectImg = (data) =>{
       dictData.imgModal = false;
-      if(dictData.selectRow[dictData.selectType][dictData.selectIndex]===undefined){
-        dictData.selectRow[dictData.selectType][dictData.selectIndex]={
-          fileName:data[0].fileName,
-          filePath:data[0].filePath,
-          id:data[0].id
-        }
-      }else{     
-        dictData.selectRow[dictData.selectType][dictData.selectIndex].fileName = data[0].fileName
-        dictData.selectRow[dictData.selectType][dictData.selectIndex].filePath = data[0].filePath
-        dictData.selectRow[dictData.selectType][dictData.selectIndex].id = data[0].id
+      dictData.selectRow[dictData.selectType][dictData.selectIndex]={
+        fileName:data[0].fileName,
+        filePath:data[0].filePath,
+        id:data[0].id
       }
-      console.log('selectImg',data)
     }
 
     const closeModal = ()=>{
@@ -263,7 +256,9 @@ export default {
       http.request("post", "/rest/api/product/v1/query/list",
       {
         pageSize:dictData.tablePage.pageSize,
-        pageNum:dictData.tablePage.currentPage
+        pageNum:dictData.tablePage.currentPage,
+        // asc:true,
+        // sortName:"sortForHome",
 
       }
       )

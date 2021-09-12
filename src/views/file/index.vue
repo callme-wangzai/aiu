@@ -116,7 +116,7 @@ export default {
         pageSize: 10,
         totalResult: 0
       },
-      baseURL:'http://47.106.86.150'
+      baseURL:'http://47.106.86.150:8083'
     });
 
     const xTree = templateRef<HTMLElement | any>("xTree", null);
