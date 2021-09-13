@@ -18,19 +18,21 @@
       :edit-config="{trigger: 'click', mode: 'cell'}"
     >
       <vxe-column type="checkbox" width="60"></vxe-column>
-      <vxe-table-column title="商品名称" field="name" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="商品名称" width="100" field="name" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="标题" field="title" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="标题" width="100" field="title" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="描述" field="desc" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="描述" width="200" field="desc" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="商城链接" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="商城链接" width="100" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="首页顺序" field="sortForHome" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="展示模板" width="100" field="renderType" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="智能硬件顺序" field="sortForMenu3" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="首页顺序" width="100" field="sortForHome" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="主图片" field="files">
+      <vxe-table-column title="智能硬件顺序" width="100" field="sortForMenu3" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      </vxe-table-column>
+      <vxe-table-column title="主图片" width="200" field="files">
         <template #default="{ row }">
           <div class="flex">
             <div>
@@ -51,7 +53,7 @@
           </div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="轮播图" field="carouselFigure">
+      <vxe-table-column title="轮播图" width="200" field="carouselFigure">
         <template #default="{ row }">
           <div v-for="item,index of row.carouselFigure" :key="index" class="flex">
             <div>{{item.fileName}}</div>
@@ -60,7 +62,7 @@
           <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure&&row.carouselFigure.length)">添加</div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="视频" field="video">
+      <vxe-table-column title="视频" width="200" field="video">
         <template #default="{ row }">
           <div v-if="row.video && row.video.fileName && row.video.fileName!==''" @click="editVideo('videoName',row)" class="link" >
             {{row.video.fileName}}

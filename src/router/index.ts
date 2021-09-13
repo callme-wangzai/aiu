@@ -5,6 +5,7 @@ import flowChartRouter from "./modules/flowchart";
 import fileRouter from "./modules/file";
 import productRouter from "./modules/product";
 import exhibitionRouter from "./modules/exhibition";
+import appInfoRouter from "./modules/appInfo";
 import accountRouter from "./modules/account";
 import bannerRouter from "./modules/banner";
 import editorRouter from "./modules/editor";
@@ -28,6 +29,7 @@ const constantRoutes: Array<any> = [
   // homeRouter,
   productRouter,
   exhibitionRouter,
+  appInfoRouter,
   fileRouter,
   accountRouter,
   // bannerRouter,
