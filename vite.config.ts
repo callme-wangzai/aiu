@@ -31,7 +31,7 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
      * @default '/'
      */
     base:
-      process.env.NODE_ENV === "production" ? "/manages/" : VITE_PUBLIC_PATH,
+      process.env.NODE_ENV === "production" ? "/" : VITE_PUBLIC_PATH,
     root,
     resolve: {
       alias
@@ -49,7 +49,7 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
       // 本地跨域代理
       proxy: {
         '/rest': {
-          target: process.env.NODE_ENV === "production" ? '':'http://47.106.86.150:8082/', // 凡是遇到 /api 路径的请求，都映射到 target 属性
+          target: process.env.NODE_ENV === "production" ? 'http://47.106.86.150:8082/':'http://47.106.86.150:8082/', // 凡是遇到 /api 路径的请求，都映射到 target 属性
           changeOrigin: true,
         }
       }

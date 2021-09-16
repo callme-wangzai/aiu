@@ -71,7 +71,7 @@ export const getServerConfig = async (): Promise<any> => {
     method: "get",
     url:
       process.env.NODE_ENV === "production"
-        ? "/manages/serverConfig.json"
+        ? "/serverConfig.json"
         : "/serverConfig.json"
   })
     .then(({ data: config }) => {

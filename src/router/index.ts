@@ -21,6 +21,39 @@ import { usePermissionStoreHook } from "/@/store/modules/permission";
 
 import { getAsyncRoutes } from "/@/api/routes";
 
+const getAsyncRoutes = [{
+  path: "/permission",
+  name: "permission",
+  redirect: "/permission/page",
+  meta: {
+    title: "message.permission",
+    icon: "el-icon-lollipop",
+    showLink: true,
+    savedPosition: true,
+    rank: 3
+  },
+  children: [
+    {
+      path: "/permission/page",
+      name: "permissionPage",
+      meta: {
+        title: "message.permissionPage",
+        showLink: true,
+        savedPosition: true
+      }
+    },
+    {
+      path: "/permission/button",
+      name: "permissionButton",
+      meta: {
+        title: "message.permissionButton",
+        showLink: true,
+        savedPosition: true,
+        authority: []
+      }
+    }
+  ]
+}];
 import Layout from "/@/layout/index.vue";
 // https://cn.vitejs.dev/guide/features.html#glob-import
 const modulesRoutes = import.meta.glob("/src/views/*/*/*.vue");
@@ -35,7 +68,7 @@ const constantRoutes: Array<any> = [
   // bannerRouter,
   // flowChartRouter,
   // editorRouter,
-  // componentsRouter,
+  componentsRouter,
   // nestedRouter,
   // externalLink,
   // errorRouter
@@ -89,7 +122,8 @@ const router = createRouter({
 
 export const initRouter = (name, next?, to?) => {
   return new Promise(resolve => {
-    getAsyncRoutes({ name }).then(({ info }) => {
+    // getAsyncRoutes({ name }).then(({ info }) => {
+      let info = getAsyncRoutes
       if (info.length === 0) {
         usePermissionStoreHook().changeSetting(info);
       } else {
@@ -116,7 +150,7 @@ export const initRouter = (name, next?, to?) => {
         path: "/:pathMatch(.*)",
         redirect: "/error/404"
       });
-    });
+    // });
   });
 };
 
