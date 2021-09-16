@@ -19,7 +19,7 @@ import { storageSession } from "../utils/storage";
 import { i18n } from "/@/plugins/i18n";
 import { usePermissionStoreHook } from "/@/store/modules/permission";
 
-import { getAsyncRoutes } from "/@/api/routes";
+// import { getAsyncRoutes } from "/@/api/routes";
 
 const getAsyncRoutes = [{
   path: "/permission",
@@ -68,7 +68,7 @@ const constantRoutes: Array<any> = [
   // bannerRouter,
   // flowChartRouter,
   // editorRouter,
-  componentsRouter,
+  // componentsRouter,
   // nestedRouter,
   // externalLink,
   // errorRouter

@@ -39,11 +39,11 @@ export default defineComponent({
   components: { SidebarItem, Logo },
   setup() {
     const routeStore = usePermissionStoreHook();
-    
+    console.log('routeStore',routeStore)
     let usename = storageSession.getItem("info")?.username;
 
     const router = useRouter().options.routes;
-
+  
     const pureApp = useAppStoreHook();
 
     const route = useRoute();
