@@ -40,9 +40,9 @@
       </vxe-table-column>
       <vxe-table-column title="预览" field="filePath">
         <template #default="{ row }">
-          <!-- <img class="img" :src="baseURL+row.filePath" alt=""> -->
-          <img v-if="row.fileType=='1'" class="img" :src="baseURL+row.filePath" alt="">
-          <video v-else class="img" :src="baseURL+row.filePath" alt=""></video>
+          <!-- <img class="img" :src="SRCURL+row.filePath" alt=""> -->
+          <img v-if="row.fileType=='1'" class="img" :src="SRCURL+row.filePath" alt="">
+          <video v-else class="img" :src="SRCURL+row.filePath" alt=""></video>
         </template>
       </vxe-table-column>
     </vxe-table>
@@ -70,6 +70,7 @@ import { useRoute, useRouter, RouteLocationMatched } from "vue-router";
 import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import { http } from "../../../utils/http";
+import { genConfig } from "../../../utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -118,7 +119,7 @@ export default {
         pageSize: 10,
         totalResult: 0
       },
-      baseURL:'http://47.106.86.150:8083',
+      SRCURL:'',
       formData:{},
     });
 
@@ -140,40 +141,6 @@ export default {
         fileData.tablePage1.totalResult = res.data.total
       })
       .catch(err=>{})
-      // setTimeout(()=>{
-      //   fileData.tableData=[
-      //     {
-      //       id: "1-1",
-      //       fileName: "筋膜枪",
-      //       title:'',
-      //       description: "serviceStatus",
-      //       fileSize:"1024kb",
-      //       fileType:1,
-      //       filePath:'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.pianshen.com%2Fimages%2F58%2F6a4f15a4993c8d0989f2c7e876de7f62.png&refer=http%3A%2F%2Fwww.pianshen.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1633102006&t=74b390905eccbdc405e596af5352a8f2',
-      //       remark:'' 
-      //     },
-      //     {
-      //       id: "1-2",
-      //       fileName: "跳绳",
-      //       title:'',
-      //       description: "onlienStatus",
-      //       fileSize:"1024kb",
-      //       filePath:'',
-      //       fileType:1,
-      //       remark:'' 
-      //     },
-      //     { 
-      //       id: 2, 
-      //       fileName: "体脂秤", 
-      //       title:'',
-      //       description: "operatingSystem" ,
-      //       fileSize:"1024kb",
-      //       filePath:'',
-      //       fileType:1,
-      //       remark:'' 
-      //     }
-      //   ]
-      // },1000)
     }
     function handlePageChange1 ({ currentPage, pageSize }) {
       fileData.tablePage1.currentPage = currentPage
@@ -188,6 +155,7 @@ export default {
       initData()
     }
     onMounted(()=>{
+      fileData.SRCURL = genConfig().SRCURL
       initData()
     })
 

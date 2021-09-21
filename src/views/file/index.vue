@@ -56,8 +56,8 @@
       </vxe-table-column>
       <vxe-table-column title="文件预览" field="filePath">
         <template #default="{ row }">
-          <img v-if="row.fileType=='1'" class="img" @click="checkFile(row)" :src="baseURL+row.filePath" alt="">
-          <video v-else class="img" @click="checkFile(row)" :src="baseURL+row.filePath" alt=""></video>
+          <img v-if="row.fileType=='1'" class="img" @click="checkFile(row)" :src="SRCURL+row.filePath" alt="">
+          <video v-else class="img" @click="checkFile(row)" :src="SRCURL+row.filePath" alt=""></video>
         </template>
       </vxe-table-column>
       <vxe-table-column title="备注" field="remark" :edit-render="{name: 'input', attrs: {type: 'text'}}">
@@ -85,6 +85,7 @@ import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import addFile from './components/AddFile.vue'
 import { http } from "../../utils/http";
+import { genConfig } from "../../utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -116,7 +117,7 @@ export default {
         pageSize: 10,
         totalResult: 0
       },
-      baseURL:'http://47.106.86.150:8083'
+      SRCURL:''
     });
 
     const xTree = templateRef<HTMLElement | any>("xTree", null);
@@ -209,7 +210,7 @@ export default {
       }
     )
     function checkFile(row){
-      window.open(dictData.baseURL+row.filePath)
+      window.open(dictData.SRCURL+row.filePath)
     }
 
     function handlePageChange ({ currentPage, pageSize }) {
@@ -225,6 +226,7 @@ export default {
       initData()
     }
     onMounted(()=>{
+      dictData.SRCURL = genConfig().SRCURL
       initData()
     })
 
