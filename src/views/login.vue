@@ -15,6 +15,7 @@ import { useRouter } from "vue-router";
 import { storageSession } from "/@/utils/storage";
 import { warnMessage, successMessage } from "/@/utils/message";
 import { http } from "/@/utils/http";
+import { initRouter } from "/@/router";
 import {
   VXETable,
 } from "vxe-table";
@@ -35,6 +36,7 @@ export default {
 
     const toPage = (info: Object): void => {
       storageSession.setItem("info", info);
+      initRouter(info.username).then(() => {});
       router.push("/product");
     };
 

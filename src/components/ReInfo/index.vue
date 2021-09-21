@@ -117,7 +117,7 @@ export default defineComponent({
         accessToken: "eyJhbGciOiJIUzUxMiJ9.test"
       });
       initRouter("admin").then(() => {});
-      router.push("/");
+      router.push("/product");
     };
 
     onBeforeMount(() => {

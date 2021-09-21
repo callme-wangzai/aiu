@@ -17,49 +17,67 @@
       :data="tableData"
       :edit-config="{trigger: 'click', mode: 'cell'}"
     >
-      <vxe-column type="checkbox" width="60"></vxe-column>
+      <vxe-column type="checkbox" width="40"></vxe-column>
       <vxe-table-column title="商品名称" width="100" field="name" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
       <vxe-table-column title="标题" width="100" field="title" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
       <vxe-table-column title="描述" width="200" field="desc" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="商城链接" width="100" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="商城链接" width="200" field="mallLink" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="展示模板" width="100" field="renderType" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="首页顺序" width="90" field="sortForHome" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="首页顺序" width="100" field="sortForHome" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="智能硬件顺序" width="90" field="sortForMenu3" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="智能硬件顺序" width="100" field="sortForMenu3" sortable :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="展示模板" width="90" field="renderType" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
-      <vxe-table-column title="主图片" width="200" field="files">
+      <vxe-table-column title="头部列表图" width="200" field="suspensions">
         <template #default="{ row }">
           <div class="flex">
             <div>
-              <span class="link" @click="editImg('files',row,0)" v-if="row.files[0]&&row.files[0].fileName!==''">
-                {{row.files[0]?row.files[0].fileName:''}}
+              <span class="link" @click="editImg('suspensions',row,0)" v-if="row.suspensions[0]&&row.suspensions[0].fileName!==''">
+                {{row.suspensions[0]?row.suspensions[0].fileName:''}}
               </span>
-              <span class="link" @click="editImg('files',row,0)" v-else>请选择</span>
+              <span class="link" @click="editImg('suspensions',row,0)" v-else>请选择</span>
               
             </div>
           </div>
+        </template>
+      </vxe-table-column>
+      <vxe-table-column title="背景图" width="200" field="backgrounds">
+        <template #default="{ row }">
           <div class="flex">
             <div>
-              <span class="link" @click="editImg('files',row,1)" v-if="row.files[1]&&row.files[1].fileName!==''">{{row.files[1]?row.files[1].fileName:''}}</span>
-              <span class="link" @click="editImg('files',row,1)" v-else>请选择</span>
+              <span class="link" @click="editImg('backgrounds',row,0)" v-if="row.backgrounds[0]&&row.backgrounds[0].fileName!==''">
+                {{row.backgrounds[0]?row.backgrounds[0].fileName:''}}
+              </span>
+              <span class="link" @click="editImg('backgrounds',row,0)" v-else>请选择</span>
+              
             </div>
-            <!-- <vxe-button type="text" icon="el-icon-edit" @click="editImg(row.files[1])"
-            ></vxe-button> -->
           </div>
+        </template>
+      </vxe-table-column>
+      <vxe-table-column title="主图片" width="200" field="files">
+        <template #default="{ row }">
+          
+          <div v-for="item,index of row.files" :key="index" class="flex">
+            <div class="nameWidth">{{item.fileName}}</div>
+            <div class="link delete" @click="filesDel(row,index)">删除</div>
+          </div>
+          <div class="link" @click="editImg('files',row,row.files&&row.files.length)">添加</div>
+        
         </template>
       </vxe-table-column>
       <vxe-table-column title="轮播图" width="200" field="carouselFigure">
         <template #default="{ row }">
+
           <div v-for="item,index of row.carouselFigure" :key="index" class="flex">
-            <div>{{item.fileName}}</div>
-            <div class="link" @click="carouseDel(row,index)">删除</div>
+            <div class="nameWidth">{{item.fileName}}</div>
+            <div class="link delete" @click="carouseDel(row,index)">删除</div>
           </div>
           <div class="link" @click="editImg('carouselFigure',row,row.carouselFigure&&row.carouselFigure.length)">添加</div>
+        
         </template>
       </vxe-table-column>
       <vxe-table-column title="视频" width="200" field="video">
@@ -151,8 +169,12 @@ export default {
       })
       http.request("post", "/rest/api/product/v1/batch/delete",ids)
       .then(res=>{
-        console.log('res',res)
-        initData()
+          if(res.code==0){
+            VXETable.modal.message({ content: res.msg, status: "success" })
+            initData()
+          }else{
+            VXETable.modal.message({ content: res.msg , status: "warning" })
+          }
       })
       .catch(err=>{})
     };
@@ -168,8 +190,11 @@ export default {
             mallLink:'',
             sortForHome:'',
             sortForMenu3:'',
+            renderType:'',
+            suspensions:[],
             files:[],
             carouselFigure:[],
+            backgrounds:[],
             video:null
           },);
     }
@@ -194,16 +219,25 @@ export default {
       if(list1.length>0){
         http.request("post", "/rest/api/product/v1/batch/add",list1)
         .then(res=>{
-          console.log('res',res)
-          initData()
+          if(res.code==0){
+            VXETable.modal.message({ content: res.msg, status: "success" })
+            initData()
+          }else{
+            VXETable.modal.message({ content: res.msg , status: "warning" })
+          }
         })
         .catch(err=>{})
       }
       if(list2.length>0){
         http.request("post", "/rest/api/product/v1/batch/modify",list2)
         .then(res=>{
-          console.log('res',res)
-          initData()
+          if(res.code==0){
+            VXETable.modal.message({ content: res.msg, status: "success" })
+            initData()
+          }else{
+            VXETable.modal.message({ content: res.msg , status: "warning" })
+          }
+          
         })
         .catch(err=>{})
       }
@@ -231,6 +265,9 @@ export default {
     }
     function carouseDel(row,index){
       row.carouselFigure.splice(index,1)
+    }
+    function filesDel(row,index){
+      row.files.splice(index,1)
     }
     const selectImg = (data) =>{
       dictData.imgModal = false;
@@ -349,6 +386,7 @@ export default {
       closeModal,
       selectVideo,
       carouseDel,
+      filesDel,
       handlePageChange
     };
   }
@@ -382,5 +420,11 @@ export default {
 .link{
   cursor: pointer;
   color: #409FFF;
+}
+.delete{
+  width:30px;
+}
+.nameWidth{
+  width:80%;
 }
 </style>

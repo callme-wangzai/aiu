@@ -79,7 +79,7 @@ export default {
 
     const onDelete = async () => {
       if(usename!=='admin'){
-        VXETable.modal.message({ content: "admin账户才有权限进行该操作", status: "warning" })
+        VXETable.modal.message({ content: "admin用户才有权限进行该操作", status: "warning" })
         return
       }
       const $table = xTree.value;
@@ -109,7 +109,7 @@ export default {
     // 新增
     function onAdd() {
       if(usename!=='admin'){
-        VXETable.modal.message({ content: "admin账户才有权限进行该操作", status: "warning" })
+        VXETable.modal.message({ content: "admin用户才有权限进行该操作", status: "warning" })
         return
       }
       const $table = xTree.value;
@@ -126,7 +126,7 @@ export default {
     //保存å
     function onSave(){
       if(usename!=='admin'){
-        VXETable.modal.message({ content: "admin账户才有权限进行该操作", status: "warning" })
+        VXETable.modal.message({ content: "admin用户才有权限进行该操作", status: "warning" })
         return
       }
       const $table = xTree.value;

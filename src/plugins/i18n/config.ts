@@ -32,7 +32,7 @@ export const menusConfig = {
       hsproduct: "商品",
       hsExhibition: "展示信息",
       hsAppInfo: "APP信息",
-      hsaccount: "账户",
+      hsaccount: "用户",
       hsaddProduct: "新增商品",
       hseditProduct: "编辑商品",
       hsbanner:"轮播图",

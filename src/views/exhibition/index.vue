@@ -212,9 +212,6 @@ export default {
     }
 
     function initData(){
-      http.request("post", "/rest/api/display/v1/find-by-keys",['main_carouselFigure']).then(res=>{
-
-      })
       http.request("get", "/rest/api/display/v1/list/all"
       )
       .then(res=>{
