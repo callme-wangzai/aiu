@@ -47,6 +47,7 @@ import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import ModalFile from './components/ModalFile.vue'
 import { http } from "../../utils/http";
+import { genConfig } from "/@/utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -100,7 +101,7 @@ export default {
       const type = await VXETable.modal.confirm("您确定要删除吗？");
       if(await type!=='confirm')return
 
-      http.request("delete", `/rest/api/app/v1/delete/${selectRecords[0].id}`)
+      http.request("delete", `${genConfig().apiURL}/rest/api/app/v1/delete/${selectRecords[0].id}`)
       .then(res=>{
         if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -153,7 +154,7 @@ export default {
         }
       }
       if(list1.length>0){
-        http.request("post", "/rest/api/app/v1/add",list1[0])
+        http.request("post", `${genConfig().apiURL}/rest/api/app/v1/add`,list1[0])
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -165,7 +166,7 @@ export default {
         .catch(err=>{})
       }
       if(list2.length>0){
-        http.request("post", "/rest/api/app/v1/modify",list2[0])
+        http.request("post", `${genConfig().apiURL}/rest/api/app/v1/modify`,list2[0])
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -216,7 +217,7 @@ export default {
     }
 
     function initData(){
-      http.request("get", "/rest/api/app/v1/list/all"
+      http.request("get", `${genConfig().apiURL}/rest/api/app/v1/list/all`
       )
       .then(res=>{
         dictData.tableData = res.data

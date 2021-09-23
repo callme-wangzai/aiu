@@ -47,6 +47,7 @@ import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import ModalFile from './components/ModalFile.vue'
 import { http } from "../../utils/http";
+import { genConfig } from "/@/utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -99,7 +100,7 @@ export default {
       let ids = selectRecords.map(item=>{
         return item.id
       })
-      http.request("post", "/rest/api/display/v1/batch/delete",ids)
+      http.request("post", `${genConfig().apiURL}/rest/api/display/v1/batch/delete`,ids)
       .then(res=>{
         if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -120,11 +121,11 @@ export default {
             key : "",
             name : "",
             pictures : [ 
-              {
-                fileName : "",
-                filePath : "",
-                id : 0
-              } 
+              // {
+              //   fileName : "",
+              //   filePath : "",
+              //   id : 0
+              // } 
             ],
             value : ""
           }
@@ -149,7 +150,7 @@ export default {
         }
       }
       if(list1.length>0){
-        http.request("post", "/rest/api/display/v1/batch/add",list1)
+        http.request("post", `${genConfig().apiURL}/rest/api/display/v1/batch/add`,list1)
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -161,7 +162,7 @@ export default {
         .catch(err=>{})
       }
       if(list2.length>0){
-        http.request("post", "/rest/api/display/v1/batch/modify",list2)
+        http.request("post", `${genConfig().apiURL}/rest/api/display/v1/batch/modify`,list2)
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -212,7 +213,7 @@ export default {
     }
 
     function initData(){
-      http.request("get", "/rest/api/display/v1/list/all"
+      http.request("get", `${genConfig().apiURL}/rest/api/display/v1/list/all`
       )
       .then(res=>{
         dictData.tableData = res.data

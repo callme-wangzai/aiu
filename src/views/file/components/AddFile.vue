@@ -10,7 +10,7 @@
     >
       <el-upload
         class="upload-demo"
-        action="/rest/api/file/v1/upload"
+        :action="`${genConfig().apiURL}/rest/api/file/v1/upload`"
         :on-preview="handlePreview"
         :on-success="uploadSuccess"
         :on-remove="handleRemove"
@@ -42,6 +42,7 @@ import { useRoute, useRouter, RouteLocationMatched } from "vue-router";
 import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import { http } from "../../../utils/http";
+import { genConfig } from "/@/utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -74,7 +75,7 @@ export default {
           remark:''
         }
       })
-      http.request("post", "/rest/api/file/v1/batch/save",fileDtos)
+      http.request("post", `${genConfig().apiURL}/rest/api/file/v1/batch/save`,fileDtos)
       .then(res=>{
         console.log('res',res)
         // initData()

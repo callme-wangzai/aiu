@@ -16,6 +16,7 @@ import { storageSession } from "/@/utils/storage";
 import { warnMessage, successMessage } from "/@/utils/message";
 import { http } from "/@/utils/http";
 import { initRouter } from "/@/router";
+import { genConfig } from "/@/utils/http/config";
 import {
   VXETable,
 } from "vxe-table";
@@ -54,7 +55,7 @@ export default {
       //       accessToken
       //     })
       //   : warnMessage(info);
-      http.request("post", "/rest/api/user/v1/login",{
+      http.request("post", `${genConfig().apiURL}/rest/api/user/v1/login`,{
         username: userName,
         password: passWord
       })

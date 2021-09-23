@@ -115,6 +115,7 @@ import XEUtils from "xe-utils";
 import { templateRef } from "@vueuse/core";
 import ModalFile from './components/ModalFile.vue'
 import { http } from "../../utils/http";
+import { genConfig } from "/@/utils/http/config";
 import {
   VXETable,
   VxeTableInstance,
@@ -167,7 +168,7 @@ export default {
       let ids = selectRecords.map(item=>{
         return item.id
       })
-      http.request("post", "/rest/api/product/v1/batch/delete",ids)
+      http.request("post", `${genConfig().apiURL}/rest/api/product/v1/batch/delete`,ids)
       .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -217,7 +218,7 @@ export default {
         }
       }
       if(list1.length>0){
-        http.request("post", "/rest/api/product/v1/batch/add",list1)
+        http.request("post", `${genConfig().apiURL}/rest/api/product/v1/batch/add`,list1)
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -229,7 +230,7 @@ export default {
         .catch(err=>{})
       }
       if(list2.length>0){
-        http.request("post", "/rest/api/product/v1/batch/modify",list2)
+        http.request("post", `${genConfig().apiURL}/rest/api/product/v1/batch/modify`,list2)
         .then(res=>{
           if(res.code==0){
             VXETable.modal.message({ content: res.msg, status: "success" })
@@ -292,7 +293,7 @@ export default {
     }
 
     function initData(){
-      http.request("post", "/rest/api/product/v1/query/list",
+      http.request("post", `${genConfig().apiURL}/rest/api/product/v1/query/list`,
       {
         pageSize:dictData.tablePage.pageSize,
         pageNum:dictData.tablePage.currentPage,

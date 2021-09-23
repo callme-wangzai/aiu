@@ -135,7 +135,7 @@ export default {
       let ids = selectRecords.map(item=>{
         return item.id
       })
-      http.request("post", "/rest/api/file/v1/batch/delete",ids)
+      http.request("post", `${genConfig().apiURL}/rest/api/file/v1/batch/delete`,ids)
       .then(res=>{
         initData()
       })
@@ -155,7 +155,7 @@ export default {
         VXETable.modal.message({ content: "请勾选数据", status: "success" })
         return
       }
-      http.request("post", "/rest/api/file/v1/batch/modify",selectRecords)
+      http.request("post", `${genConfig().apiURL}/rest/api/file/v1/batch/modify`,selectRecords)
       .then(res=>{
         console.log('res',res)
         initData()
@@ -183,7 +183,7 @@ export default {
 
     function initData(){
       dictData.loading = true;  
-      http.request("post", "/rest/api/file/v1/query/list",
+      http.request("post", `${genConfig().apiURL}/rest/api/file/v1/query/list`,
       {
         request:{
           fileType:dictData.fileType,
