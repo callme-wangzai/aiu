@@ -10,10 +10,11 @@
     >
       <el-upload
         class="upload-demo"
-        :action="`${genConfig().apiURL}/rest/api/file/v1/upload`"
+        :action="actionUrl"
         :on-preview="handlePreview"
         :on-success="uploadSuccess"
         :on-remove="handleRemove"
+        :on-progress="progress"
         :before-remove="beforeRemove"
         multiple
         :limit="3"
@@ -90,7 +91,8 @@ export default {
     }
     const fileData = reactive({
       submitLoading: false,
-      fileList:[]
+      fileList:[],
+      actionUrl:''
     });
 
     function handleRemove(file, fileList) {
@@ -112,9 +114,14 @@ export default {
     function beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${ file.name }？`);
     }
+    function progress(event, file, fileList){
+      console.log('event',event)
+      console.log('file',file)
+      console.log('fileList',fileList)
+    }
 
     onMounted(()=>{
-
+      fileData.actionUrl=genConfig().apiURL+'/rest/api/file/v1/upload'
     })
 
     return {
@@ -125,7 +132,8 @@ export default {
       handlePreview,
       uploadSuccess,
       handleExceed,
-      beforeRemove
+      beforeRemove,
+      progress
     };
   }
 };

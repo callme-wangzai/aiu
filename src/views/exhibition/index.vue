@@ -22,6 +22,14 @@
       </vxe-table-column>
       <vxe-table-column title="key" field="key" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
+      <vxe-table-column title="图片尺寸" field="">
+        <template #default="{ row }">
+          <div v-if="row.key=='about_us'">1860*任意</div>
+          <div v-if="row.key=='course_list'">595*500</div>
+          <div v-if="row.key=='intelligent_data'">1920*任意</div>
+          <div v-if="row.key=='main_carouselFigure'">1920*1080</div>
+        </template>
+      </vxe-table-column>
       <vxe-table-column title="value" field="value" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
       <vxe-table-column title="轮播图" field="pictures">

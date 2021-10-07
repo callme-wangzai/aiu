@@ -49,7 +49,8 @@ export default ({ command }: ConfigEnv): UserConfigExport => {
       // 本地跨域代理
       proxy: {
         '/rest': {
-          target:'http://manager-api.aiyoukit.com', //http://47.106.86.150:8082/ 凡是遇到 /api 路径的请求，都映射到 target 属性
+          // target:'http://manager-api.aiyoukit.com', //http://47.106.86.150:8082/ 凡是遇到 /api 路径的请求，都映射到 target 属性
+          target:'http://47.106.86.150:8082/', //凡是遇到 /api 路径的请求，都映射到 target 属性
           changeOrigin: true,
         }
       }
