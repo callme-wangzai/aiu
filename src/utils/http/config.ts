@@ -4,10 +4,10 @@ import { excludeProps } from "./utils";
  * 默认配置
  */
 export const defaultConfig: AxiosRequestConfig = {
-  SRCURL: "http://manager-file.aiyoukit.com",
-  apiURL:"http://manager-api.aiyoukit.com",
-  // SRCURL: "http://47.106.86.150:8083",
-  // apiURL:"http://47.106.86.150:8082",
+  // SRCURL: "http://manager-file.aiyoukit.com",
+  // apiURL:"http://manager-api.aiyoukit.com",
+  SRCURL: "http://47.106.86.150:8083",
+  apiURL:"http://47.106.86.150:8082",
   timeout: 10000, //10秒超时
   headers: {
     Accept: "application/json, text/plain, */*",

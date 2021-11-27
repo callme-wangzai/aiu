@@ -60,7 +60,7 @@
           <video v-else class="img" @click="checkFile(row)" :src="SRCURL+row.filePath" alt=""></video>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="备注" field="remark" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      <vxe-table-column title="链接地址" field="remark" :edit-render="{name: 'input', attrs: {type: 'text'}}">
       </vxe-table-column>
     </vxe-table>
     <vxe-pager

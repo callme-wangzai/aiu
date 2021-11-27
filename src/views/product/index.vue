@@ -57,9 +57,10 @@
           </div>
         </template>
       </vxe-table-column>
-      <vxe-table-column title="展示模板" width="90" field="renderType" :edit-render="{name: 'input', attrs: {type: 'text'}}">
-      </vxe-table-column>
-      <vxe-table-column title="主图片" width="200" :title-help="{message: '模版1：3张图，都是460*258；模板2：第1张590*470，后面3张是414*414；模版3：2张图，都是730*260；模板4：3张图，都是 414*414'}" field="files">
+      <!-- <vxe-table-column title="展示模板" width="90" field="renderType" :edit-render="{name: 'input', attrs: {type: 'text'}}">
+      </vxe-table-column> -->
+      <!-- 模版1：3张图，都是460*258；模板2：第1张590*470，后面3张是414*414；模版3：2张图，都是730*260；模板4：3张图，都是 414*414 -->
+      <vxe-table-column title="主图片" width="200" :title-help="{message: '按顺序，前两个是828*828；第三个是1440*712'}" field="files">
         <template #default="{ row }">
           
           <div v-for="item,index of row.files" :key="index" class="flex">
@@ -70,7 +71,7 @@
         
         </template>
       </vxe-table-column>
-      <vxe-table-column title="轮播图" width="200" :title-help="{message: '图片尺寸为1920*1080'}" field="carouselFigure">
+      <vxe-table-column title="轮播图" width="200" :title-help="{message: '图片尺寸为1920*1080;四张大图的为990*850'}" field="carouselFigure">
         <template #default="{ row }">
 
           <div v-for="item,index of row.carouselFigure" :key="index" class="flex">
